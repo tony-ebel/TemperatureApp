@@ -16,12 +16,11 @@
 						location: $("#inLocation").val()
 					},
 					function(data, httpStatus){
-						if (httpStatus === "success"){
-							console.log('good');
-							$("#outContent").html(data);
+						var parsedData = JSON.parse(data);
+						if (httpStatus === "success" && parsedData['cod'] == 200){
+							buildContent(parsedData);
 						} else {
-							console.log('bad');
-							$("#outContent").html("\n<p>Oops! An error occured</p>\n<br>\n<p>Status: " + httpStatus + "</p>\n");
+							$("#outContent").html("\n<p>Oops! City not found!</p>");
 						};
 					}
 				);
@@ -29,6 +28,16 @@
 				$("#inLocation").val('');
 				$("#inLocation").focus();
 			}
+			
+			function buildContent(apiData){ 
+				var temp = apiData['main']['temp'];
+				var city = apiData['name'] + ", " + apiData['sys']['country'];
+				var content = '<h2>' + temp + '</h2>' + '<h4>' + city + '</h4>';
+				
+				$("#outContent").html(content);
+				//icon base url: https://openweathermap.org/img/w/
+			}
+			
 			function checkEnter(e){
 				var charCode;
 				if (e && e.which){
