@@ -1,9 +1,11 @@
 <?php
-	/* Validation will go here (Server Side)*/
-	if($_POST['location']){
-		$location = urlencode($_POST['location']);
-	} else {
+	/* Validation (Server Side)*/
+	if(!$_POST || !$_POST['location']){
 		exit('{"cod":400,"message":"No location given"}');
+	} elseif (!preg_match("/^[a-zA-Z][a-zA-Z]+\s*[a-zA-Z]+(?:,\s[a-zA-Z]{2})*$/", $_POST['location'])){
+		exit('{"cod":400,"message":"Invalid location"}');
+	} else {
+		$location = urlencode($_POST['location']);
 	}
 
 	$url = "http://api.openweathermap.org/data/2.5/weather?q={$location}&units=imperial&APPID=141074e8a2059d7ec47d6e662cd5089a";

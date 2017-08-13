@@ -8,28 +8,32 @@
 		<!-- Include jQuery Google CDN -->
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 		<script>
-			function btnPress(){
-				/* Validation will go here */
+			function validate(){
+				var re = /^[a-zA-Z][a-zA-Z]+\s*[a-zA-Z]+(?:,\s[a-zA-Z]{2})*$/;
+				var inputBox = $("#inLocation");
 
-				$.post(document.location.href + 'getTemp.php',
-					{
-						location: $("#inLocation").val()
-					},
-					function(data, httpStatus){
-						var parsedData = JSON.parse(data);
-						if (httpStatus === "success" && parsedData['cod'] == 200){
-							buildContent(parsedData);
-						} else {
-							$("#outContent").html("\n<p>Oops! City not found!</p>");
-						};
-					}
-				);
+				if (re.test(inputBox.val())){
+					$.post(document.location.href + 'getTemp.php',
+						{location: $("#inLocation").val()},
+						function(data, httpStatus){
+							var parsedData = JSON.parse(data);
+							if (httpStatus === "success" && parsedData['cod'] == 200){
+								buildContent(parsedData);
+							} else {
+								$("#outContent").html("\n<p>Oops! City not found!</p>");
+							};
+						}
+					);
+				} else {
+					inputBox.css({"background-color": "indianred"});
+					setTimeout(function(){inputBox.removeAttr("style");}, 2000);
+				}
 				
-				$("#inLocation").val('');
-				$("#inLocation").focus();
+				inputBox.val('');
+				inputBox.focus();
 			}
 			
-			function buildContent(apiData){ 
+			function buildContent(apiData){
 				var temp = apiData['main']['temp'];
 				var city = apiData['name'] + ", " + apiData['sys']['country'];
 				var content = '<h2>' + temp + '</h2>' + '<h4>' + city + '</h4>';
@@ -44,12 +48,17 @@
 					charCode = e.which;
 				};
 				if (charCode == 13){
-					btnPress();
+					validate();
 				} else {
 					return true;
 				};
 			}
 		</script>
+		<style>
+			#inLocation {
+				transition: background-color 0.8s;
+			}
+		</style>
 	</head>
 
 	<body>
@@ -59,11 +68,11 @@
 
 		<section>
 			<input id="inLocation" placeholder="Search a location..." type="text" maxlength="35" autofocus onkeypress="checkEnter(event);">
-			<input id="inSearch" type="button" value="Update" onclick="btnPress();">
+			<input id="inSearch" type="button" value="Update" onclick="validate();">
 
 			<section id="outContent">...</section>
 		</section>
 
 	</body>
 
-</html> 
+</html>
