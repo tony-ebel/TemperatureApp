@@ -1,0 +1,79 @@
+
+<!doctype html>
+<html lang="en-US">
+	<head>
+		<!-- Meta -->
+		<meta charset="utf-8">
+		<title>Temp App</title>
+
+		<!-- Include jQuery Google CDN -->
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<link href="main.css" rel="stylesheet" type="text/css">
+		<script>
+			function validate(){ //Submits AJAX request if input string is valid
+
+				//regex to validate against
+				var re = /^[a-zA-Z][a-zA-Z]+\s*[a-zA-Z]+(?:,\s[a-zA-Z]{2})*$/;
+				var inputBox = $("#inLocation");
+
+				// ensure input length and regex pass before we call AJAX
+				if (inputBox.val().length > 2 && re.test(inputBox.val())){
+					$.post('getTemp.php',
+						{location: $("#inLocation").val()},
+						function(data, httpStatus){
+							var parsedData = JSON.parse(data); //parse returned JSON
+							if (httpStatus === "success" && parsedData['cod'] == 200){ //ensure sucessful status and API query found a city
+								buildContent(parsedData);
+							} else {
+								$("#outContent").html("\n<p>Oops! City not found!</p>");
+							};
+						}
+					);
+				} else { //simple visual cue that validation failed
+					inputBox.css({"background-color": "indianred"});
+					setTimeout(function(){inputBox.removeAttr("style");}, 1000);
+				}
+				
+				inputBox.val('');
+				inputBox.focus();
+			}
+			
+			function buildContent(apiData){ //build elements with data from API and insert into page
+				var city = apiData['name'] + ", " + apiData['sys']['country'];
+				var temp = Math.round(apiData['main']['temp']);
+				var iconUrl = '"//openweathermap.org/img/w/' + apiData['weather']['0']['icon'] + '.png"';
+				var desc = apiData['weather']['0']['description'];
+				var content = '<h4>' + city + '</h4>' + '<section><img src=' + iconUrl + '>' + '<h2>' + temp + '</h2></section>' + '<p>' + desc + '</p>';
+				
+				$("#outContent").html(content);
+			}
+			
+			function checkEnter(e){ //simple check for carriage return in input
+				var charCode;
+				if (e && e.which){
+					charCode = e.which;
+				};
+				if (charCode == 13){
+					validate(); 
+				} else {
+					return true;
+				};
+			}
+		</script>
+	</head>
+
+	<body>
+		<header>
+			<h1>Temperature App</h1>
+		</header>
+
+		<section id="main">
+			<input id="inLocation" placeholder="Enter a location..." type="text" maxlength="35" autofocus autocomplete="off" onkeypress="checkEnter(event);">
+			<input id="inSearch" type="button" value="Search" onclick="validate();">
+
+			<section id="outContent"></section>
+		</section>
+
+	</body>
+
+</html>
