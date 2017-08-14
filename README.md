@@ -4,6 +4,8 @@
 Simple web application that accepts a location as input and displays current temperature into the page.
 *Includes vagrant vm (Ubuntu 14.05)*
 
+![img](https://tonyebel.com/example.gif)
+
 HOW TO:
 
 	1. Clone this Git repo
@@ -33,3 +35,4 @@ Examples of valid input:
 	3. Overland Park
 	4. Overland Park, KS
 	5. London, GB
+
